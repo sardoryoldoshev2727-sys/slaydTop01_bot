@@ -20,6 +20,15 @@ const genAI = new GoogleGenerativeAI(geminiKey);
 let users = {};
 bot.use(session());
 
+// Foydalanuvchini tekshirish yoki yaratish funksiyasi
+function checkUser(ctx) {
+    const userId = ctx.from.id;
+    if (!users[userId]) {
+        users[userId] = { balance: 5, font: 'Arial', step: '' };
+    }
+    return users[userId];
+}
+
 // --- ASOSIY MENYU ---
 const mainMenu = (ctx) => {
     return ctx.reply("✨ SlaydTop AI botiga xush kelibsiz! ❤️\nSlayd mavzusini yozing, AI uni tayyorlab beradi.", 
@@ -31,45 +40,53 @@ const mainMenu = (ctx) => {
 };
 
 bot.start((ctx) => {
-    const userId = ctx.from.id;
-    if (!users[userId]) users[userId] = { balance: 5, font: 'Arial', step: '' };
+    checkUser(ctx);
     mainMenu(ctx);
 });
 
 bot.hears('💻 Slayd Yaratish (AI)', (ctx) => {
-    const userId = ctx.from.id;
+    const user = checkUser(ctx);
     ctx.reply("Slayd mavzusini yuboring (Masalan: 'O\'zbekistonning diqqatga sazovor joylari'): 📚");
-    users[userId].step = 'WAITING_TOPIC';
+    user.step = 'WAITING_TOPIC';
 });
 
 // --- AI ORQALI SLAYD MAZMUNINI YARATISH ---
 async function getAIContent(topic) {
     try {
+        console.log("🤖 AI sorov yuborilmoqda: ", topic);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const prompt = `Siz professional slayd yaratuvchisiz. '${topic}' mavzusida 5 ta slayd uchun reja va batafsil matn tayyorlang. 
-        Juda muhim: Har bir slaydni 'S:' bilan boshlang va sarlavha bilan matnni '|' bilan ajrating.
-        Format shunday bo'lsin:
+        Muhim: Har bir slaydni 'S:' bilan boshlang va sarlavha bilan matnni '|' bilan ajrating.
+        Format:
         S: Sarlavha 1 | Batafsil matn...
         S: Sarlavha 2 | Batafsil matn... `;
         
         const result = await model.generateContent(prompt);
-        return result.response.text();
+        const text = result.response.text();
+        console.log("✅ AI javobi olindi.");
+        return text;
     } catch (err) {
-        console.error("AI Generation Error:", err);
+        console.error("❌ AI Generation Error Details:", err.message);
         return null;
     }
 }
 
 bot.on('text', async (ctx) => {
     const userId = ctx.from.id;
-    if (users[userId]?.step === 'WAITING_TOPIC') {
+    const user = checkUser(ctx);
+
+    if (user.step === 'WAITING_TOPIC') {
         const topic = ctx.message.text;
+        if (topic.length < 3) return ctx.reply("❌ Mavzu juda qisqa.");
+
         ctx.reply("🤖 AI ma'lumot yig'moqda va slayd yaratmoqda, iltimos kuting... ⏳");
         
         try {
             const aiText = await getAIContent(topic);
+            
             if (!aiText) {
-                return ctx.reply("❌ Gemini AI bilan ulanib bo'lmadi. API kalitni tekshiring.");
+                console.log("❌ AI javob bermadi. Kalitni tekshiring.");
+                return ctx.reply("❌ Gemini AI bilan ulanib bo'lmadi. Railway-dagi GEMINI_API_KEY kalitingizni tekshiring.");
             }
 
             const fileName = await createSlayd(topic, aiText, userId);
@@ -77,10 +94,10 @@ bot.on('text', async (ctx) => {
             
             if (fs.existsSync(fileName)) fs.unlinkSync(fileName);
         } catch (err) {
-            ctx.reply("❌ Xatolik yuz berdi. Kodni tekshiring yoki adminga yozing.");
+            ctx.reply("❌ Slayd yaratishda xatolik yuz berdi. Railway loglarini tekshiring.");
             console.error(err);
         }
-        users[userId].step = '';
+        user.step = '';
     }
 });
 
@@ -111,6 +128,6 @@ bot.launch()
     .then(() => console.log("✅ Bot muvaffaqiyatli ishga tushdi!"))
     .catch((err) => console.error("❌ Botni ishga tushirishda xato:", err));
 
-// Railway loyihasi uxlab qolmasligi uchun (Health Check)
+// Railway uchun Health Check
 const http = require('http');
 http.createServer((req, res) => { res.write('Bot is running!'); res.end(); }).listen(process.env.PORT || 3000);
