@@ -394,15 +394,21 @@ async function createSlayd(topic, aiContent, userId, templateId = null, slideCou
     const user = getUser(userId);
     const fontFace = user.settings?.font || 'Arial';
 
-    // Shablon qo'llash (agar mavjud bo'lsa)
+    // SHABLON QO'LLASH (YANGILANGAN TIZIM)
     if (templateId) {
-        const template = getTemplateById(templateId);
-        if (template && template.filePath && fs.existsSync(template.filePath)) {
+        // templateId masalan "1" yoki "01" kelsa, uni "template_01.pptx" ga aylantiramiz
+        const tId = templateId.toString().padStart(2, '0');
+        const templatePath = path.join(__dirname, 'templates', `template_${tId}.pptx`);
+        
+        if (fs.existsSync(templatePath)) {
             try {
-                pptx.load(template.filePath);
+                pptx.layout = { name: "LAYOUT_FROM_TEMPLATE" };
+                console.log(`✅ Shablon topildi: template_${tId}.pptx`);
             } catch (e) {
-                console.log("Shablon yuklash xatosi, oddiy dizayn ishlatiladi");
+                console.log("⚠️ Shablonni o'qishda xatolik, oddiy dizayn ishlatiladi");
             }
+        } else {
+            console.log(`❌ Shablon topilmadi: ${templatePath}`);
         }
     }
 
@@ -470,7 +476,6 @@ async function createSlayd(topic, aiContent, userId, templateId = null, slideCou
     await pptx.writeFile({ fileName: name });
     return name;
 }
-
 async function createCrosswordPPTX(topic, aiContent, userId, questionCount) {
     const pptx = new PptxGenJS();
     const user = getUser(userId);
