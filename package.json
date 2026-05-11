@@ -1,7 +1,7 @@
 {
   "name": "slaydtop-ai-bot",
-  "version": "2.0.0",
-  "description": "SlaydTop AI - Telegram bot for generating slides, tests, crosswords, essays, and more",
+  "version": "3.0.0",
+  "description": "SlaydTop AI - Professional Telegram bot for educational content generation with AI power",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js",
@@ -13,7 +13,7 @@
     "@google/generative-ai": "^0.21.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.1.0"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -24,7 +24,15 @@
     "ai",
     "slides",
     "pptx",
-    "education"
+    "education",
+    "crossword",
+    "test",
+    "essay",
+    "referat",
+    "tezis",
+    "glossary",
+    "click",
+    "payme"
   ],
   "author": "SlaydTop",
   "license": "MIT"
