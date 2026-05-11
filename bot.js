@@ -309,7 +309,8 @@ function getSlidePackage(count) {
 }
 
 // ==================== AI KONTENT YARATISH ====================
-async function getAIContent(topic, count = 5, type = 'slides', options = {}) {
+
+   async function getAIContent(topic, count = 5, type = 'slides', options = {}) {
     if (!genAI) {
         console.error("Gemini AI kalit so'z topilmadi!");
         return null;
@@ -438,16 +439,24 @@ SOZ: 2 | So'z | Til | Ta'rif`;
                 prompt = `"${topic}" mavzusida ${count} ta element yarat.`;
         }
 
+        // --- ASOSIY O'ZGARISH SHU YERDA ---
         const result = await model.generateContent(prompt);
-        const text = result.response.text();
+        const response = await result.response; // response.text() dan oldin buni kutish kerak
+        const text = response.text();
+        
         console.log("AI javobi olindi. Uzunlik:", text.length);
         return text;
+        // ---------------------------------
+
     } catch (err) {
-        console.error("AI Generation Error:", err.message);
+        console.error("===== GEMINI XATOSI =====");
+        console.error("Xabar:", err.message);
+        console.error("Stack:", err.stack);
+        console.error("=========================");
         return null;
     }
 }
-
+           
 // ==================== PPTX FAYL YARATISH ====================
 async function createSlayd(topic, aiContent, userId, templateId = null, slideCount = 5) {
     try {
