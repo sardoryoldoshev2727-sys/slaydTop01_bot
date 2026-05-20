@@ -1,12 +1,14 @@
 const { Telegraf, Markup, session } = require('telegraf');
 const PptxGenJS = require("pptxgenjs");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { OpenAI } = require("openai");
 const fs = require('fs');
 const path = require('path');
 
 // ==================== KONFIGURATSIYA ====================
 const token = process.env.TELEGRAM_BOT_TOKEN ? process.env.TELEGRAM_BOT_TOKEN.trim() : '';
 const geminiKey = process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : '';
+const deepseekKey = process.env.DEEPSEEK_API_KEY ? process.env.DEEPSEEK_API_KEY.trim() : '';
 const adminId = process.env.ADMIN_ID ? Number(process.env.ADMIN_ID) : 0;
 const adminUsername = process.env.ADMIN_USERNAME || '';
 const adminPhone = process.env.ADMIN_PHONE || '+998901234567';
@@ -23,6 +25,7 @@ if (!token) {
 
 // ==================== GLOBAL O'ZGARUVCHILAR ====================
 const genAI = geminiKey ? new GoogleGenerativeAI(geminiKey) : null;
+const openai = deepseekKey ? new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: deepseekKey }) : null;
 const DATA_DIR = path.join(__dirname, 'data');
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
 const ASSETS_DIR = path.join(__dirname, 'assets');
