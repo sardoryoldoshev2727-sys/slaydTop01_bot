@@ -442,9 +442,16 @@ SOZ: 2 | So'z | Til | Ta'rif`;
         }
 
         // --- ASOSIY O'ZGARISH SHU YERDA ---
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-const result = await model.generateContent(prompt);
-const text = result.response.text();
+const Groq = require("groq-sdk");
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const completion = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+        { role: "system", content: "Siz qoidalarga qat'iy amal qiladigan yordamchisiz." },
+        { role: "user", content: prompt }
+    ]
+});
+const text = completion.choices[0].message.content;
         // ---------------------------------
 
     } catch (err) {
