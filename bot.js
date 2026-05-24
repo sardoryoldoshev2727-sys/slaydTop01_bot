@@ -442,18 +442,9 @@ SOZ: 2 | So'z | Til | Ta'rif`;
         }
 
         // --- ASOSIY O'ZGARISH SHU YERDA ---
-        const response = await openai.chat.completions.create({
-    model: "deepseek-chat",
-    messages: [
-        { role: "system", content: "Siz qoidalarga qat'iy amal qiladigan yordamchisiz." },
-        { role: "user", content: prompt }
-    ],
-    stream: false
-});
-const text = response.choices[0].message.content;
-        
-        console.log("AI javobi olindi. Uzunlik:", text.length);
-        return text;
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const result = await model.generateContent(prompt);
+const text = result.response.text();
         // ---------------------------------
 
     } catch (err) {
