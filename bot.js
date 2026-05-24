@@ -313,8 +313,10 @@ function getSlidePackage(count) {
 
 // ==================== AI KONTENT YARATISH ====================
 
-   async function getAIContent(topic, count = 5, type = 'slides', options = {}) {
-    if (!genAI) {
+  if (!openai) {
+    console.error("DeepSeek API kalit topilmadi!");
+    return null;
+}
         console.error("Gemini AI kalit so'z topilmadi!");
         return null;
     }
@@ -443,9 +445,15 @@ SOZ: 2 | So'z | Til | Ta'rif`;
         }
 
         // --- ASOSIY O'ZGARISH SHU YERDA ---
-        const result = await model.generateContent(prompt);
-        const response = await result.response; // response.text() dan oldin buni kutish kerak
-        const text = response.text();
+        const response = await openai.chat.completions.create({
+    model: "deepseek-chat",
+    messages: [
+        { role: "system", content: "Siz qoidalarga qat'iy amal qiladigan yordamchisiz." },
+        { role: "user", content: prompt }
+    ],
+    stream: false
+});
+const text = response.choices[0].message.content;
         
         console.log("AI javobi olindi. Uzunlik:", text.length);
         return text;
