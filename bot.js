@@ -317,12 +317,8 @@ function getSlidePackage(count) {
     console.error("DeepSeek API kalit topilmadi!");
     return null;
 }
-        console.error("Gemini AI kalit so'z topilmadi!");
-        return null;
-    }
     try {
         console.log("AI so'rov yuborilmoqda:", { topic, count, type });
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         let prompt = '';
         const difficulty = options.difficulty || "O'rta";
 
