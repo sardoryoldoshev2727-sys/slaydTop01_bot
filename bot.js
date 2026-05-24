@@ -1831,15 +1831,12 @@ async function generateAndSendSlides(ctx, userId) {
     const count = ctx.session.slideCount || 5;
     const templateId = ctx.session.templateId || null;
     const price = ctx.session.slidePrice || 0;
-
     try {
-        // Bepul slaydni hisoblash
         if ((user.freeSlidesUsed || 0) < 2 && price === 0) {
             updateUser(userId, { freeSlidesUsed: (user.freeSlidesUsed || 0) + 1 });
         } else {
             updateUser(userId, { balance: (user.balance || 0) - price });
         }
-
         await ctx.reply(
             `${E.robot} AI ma'lumot yig'moqda va slayd yaratmoqda... ${E.clock}\n` +
             `${E.fire} Mavzu: ${topic}\n` +
@@ -1847,9 +1844,8 @@ async function generateAndSendSlides(ctx, userId) {
             `${E.pic} Shablon: ${templateId || 'Standart'}`,
             { reply_markup: { remove_keyboard: true } }
         );
-
         const aiContent = await getAIContent(topic, count, 'slides');
-
+        console.log("aiContent natija:", aiContent ? 'KELDI, uzunlik: ' + aiContent.length : 'NULL');
         if (!aiContent) {
             if (price > 0) updateUser(userId, { balance: (user.balance || 0) + price });
             updateUser(userId, { step: 'MAIN_MENU' });
@@ -1858,35 +1854,39 @@ async function generateAndSendSlides(ctx, userId) {
                 Keyboards.mainMenu(userId === adminId)
             );
         }
-
         await ctx.reply(`${E.magic} Slayd dizayni qilinmoqda... ${E.rocket}`);
-
+        console.log("PPTX yaratish boshlanmoqda. aiContent uzunlik:", aiContent.length);
         const fileName = await createSlayd(topic, aiContent, userId, templateId, count);
-
+        console.log("PPTX natija:", fileName ? fileName : 'NULL - yaratilmadi');
+        if (!fileName) {
+            if (price > 0) updateUser(userId, { balance: (user.balance || 0) + price });
+            updateUser(userId, { step: 'MAIN_MENU' });
+            return ctx.reply(
+                `${E.wrong} Slayd yaratishda xatolik yuz berdi.`,
+                Keyboards.mainMenu(userId === adminId)
+            );
+        }
         await ctx.replyWithDocument({ source: fileName }, {
             caption: `${E.check} Slayd tayyor! ${E.trophy}\n` +
                      `${topic}\n` +
                      `${count} ta slayd\n` +
                      `${price > 0 ? price.toLocaleString() + ' so\'m' : 'BEPUL'}`
         });
-
         addOrder(userId, 'slides', { topic, count, price, templateId }, fileName);
         updateUser(userId, { totalSlides: (user.totalSlides || 0) + 1, step: 'MAIN_MENU' });
-
         if (fs.existsSync(fileName)) fs.unlinkSync(fileName);
-
         return ctx.reply(`${E.clap} 1 tadan 5 tagacha baholang:`, Keyboards.rating());
     } catch (err) {
-        console.error("Slayd yaratish xatosi:", err);
+        console.error("Slayd yaratish xatosi:", err.message);
+        console.error("Stack:", err.stack);
         if (price > 0) updateUser(userId, { balance: (user.balance || 0) + price });
         updateUser(userId, { step: 'MAIN_MENU' });
         return ctx.reply(
-            `${E.wrong} Slayd yaratishda xatolik: ${err.message}`,
+            `${E.wrong} Xatolik: ${err.message}`,
             Keyboards.mainMenu(userId === adminId)
         );
     }
 }
-
 // ==================== RASM HANDLER (TO'LOV CHEKLARI) ====================
 bot.on('photo', async (ctx) => {
     const userId = ctx.from.id;
