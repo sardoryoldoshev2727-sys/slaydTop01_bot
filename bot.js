@@ -452,6 +452,7 @@ const completion = await groq.chat.completions.create({
     ]
 });
 const text = completion.choices[0].message.content;
+        console.log("GROQ JAVOBI OLINDI. Uzunlik:", text ? text.length : 'NULL');
         // ---------------------------------
 
     } catch (err) {
