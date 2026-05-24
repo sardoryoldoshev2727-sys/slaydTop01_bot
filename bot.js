@@ -312,8 +312,8 @@ function getSlidePackage(count) {
 }
 
 // ==================== AI KONTENT YARATISH ====================
-
-  if (!openai) {
+async function getAIContent(topic, count = 5, type = 'slides', options = {}) {
+    if (!openai) {
     console.error("DeepSeek API kalit topilmadi!");
     return null;
 }
