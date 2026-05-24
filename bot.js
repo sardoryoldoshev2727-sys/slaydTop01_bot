@@ -442,7 +442,7 @@ SOZ: 2 | So'z | Til | Ta'rif`;
         }
 
         // --- ASOSIY O'ZGARISH SHU YERDA ---
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 const result = await model.generateContent(prompt);
 const text = result.response.text();
         // ---------------------------------
