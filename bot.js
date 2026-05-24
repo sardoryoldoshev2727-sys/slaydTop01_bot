@@ -442,17 +442,18 @@ SOZ: 2 | So'z | Til | Ta'rif`;
         }
 
         // --- ASOSIY O'ZGARISH SHU YERDA ---
-const Groq = require("groq-sdk");
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-        { role: "system", content: "Siz qoidalarga qat'iy amal qiladigan yordamchisiz." },
-        { role: "user", content: prompt }
-    ]
-});
-const text = completion.choices[0].message.content;
+ const Groq = require("groq-sdk");
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+        const completion = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+                { role: "system", content: "Siz qoidalarga qat'iy amal qiladigan yordamchisiz." },
+                { role: "user", content: prompt }
+            ]
+        });
+        const text = completion.choices[0].message.content;
         console.log("GROQ JAVOBI OLINDI. Uzunlik:", text ? text.length : 'NULL');
+        return text;
         // ---------------------------------
 
     } catch (err) {
