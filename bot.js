@@ -10,6 +10,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN ? process.env.TELEGRAM_BOT_TOKEN.tr
 const geminiKey = process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : '';
 const deepseekKey = process.env.DEEPSEEK_API_KEY ? process.env.DEEPSEEK_API_KEY.trim() : '';
 const adminId = process.env.ADMIN_ID ? Number(process.env.ADMIN_ID) : 0;
+console.log("DEEPSEEK STATUS:", deepseekKey ? 'kalit bor, uzunlik: ' + deepseekKey.length : 'KALIT YOQ!');
 const adminUsername = process.env.ADMIN_USERNAME || '';
 const adminPhone = process.env.ADMIN_PHONE || '+998901234567';
 
