@@ -314,8 +314,8 @@ function getSlidePackage(count) {
 
 // ==================== AI KONTENT YARATISH ====================
 async function getAIContent(topic, count = 5, type = 'slides', options = {}) {
-    if (!openai) {
-    console.error("DeepSeek API kalit topilmadi!");
+if (!genAI) {
+    console.error("Gemini API kalit topilmadi!");
     return null;
 }
     try {
