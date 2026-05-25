@@ -441,18 +441,24 @@ SOZ: 2 | So'z | Til | Ta'rif`;
                 prompt = `"${topic}" mavzusida ${count} ta element yarat.`;
         }
 
-        // --- ASOSIY O'ZGARISH SHU YERDA ---
- const Groq = require("groq-sdk");
-        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-        const completion = await groq.chat.completions.create({
-            model: "llama-3.3-70b-versatile",
-            messages: [
-                { role: "system", content: "Siz qoidalarga qat'iy amal qiladigan yordamchisiz." },
-                { role: "user", content: prompt }
-            ]
+        // --- OPENROUTER ---
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "meta-llama/llama-3.3-70b-instruct",
+                messages: [
+                    { role: "system", content: "Siz qoidalarga qat'iy amal qiladigan yordamchisiz." },
+                    { role: "user", content: prompt }
+                ]
+            })
         });
-        const text = completion.choices[0].message.content;
-        console.log("GROQ JAVOBI OLINDI. Uzunlik:", text ? text.length : 'NULL');
+        const data = await response.json();
+        const text = data.choices[0].message.content;
+        console.log("OPENROUTER JAVOBI OLINDI. Uzunlik:", text ? text.length : 'NULL');
         return text;
         // ---------------------------------
 
