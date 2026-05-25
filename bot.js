@@ -314,10 +314,6 @@ function getSlidePackage(count) {
 
 // ==================== AI KONTENT YARATISH ====================
 async function getAIContent(topic, count = 5, type = 'slides', options = {}) {
-if (!genAI) {
-    console.error("Gemini API kalit topilmadi!");
-    return null;
-}
     try {
         console.log("AI so'rov yuborilmoqda:", { topic, count, type });
         let prompt = '';
